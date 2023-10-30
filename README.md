@@ -12,6 +12,8 @@
   caoyunzhou/cocopilot-chatgpt
 ```
 
+- [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/kQpQmc?referralCode=CG56Re)
+
 ## 使用
 
 - IP访问
