@@ -1,10 +1,8 @@
 # cocopilot
-这个项目提供了一个快速简便的方式来使用cocopilot
+- 这个项目提供了一个快速简便的方式来使用cocopilot to chatgpt
+- 建议自己部署 重点强调自己部署，降低风控
 
-## 建议自己部署
-- 重点强调自己部署，降低风控
-
-## 部署
+## Docker部署
 
 - docker run快速开始：
 
@@ -15,6 +13,7 @@
   caoyunzhou/cocopilot-chatgpt
 ```
 
+## Railway部署：
 - [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/kQpQmc?referralCode=CG56Re)
 
 ## 使用
@@ -42,6 +41,7 @@ curl --location 'https://cocopilot.aivvm.com/v1/chat/completions' \
 ```
 
 
-## 获取cocopilot token GHO-xxx
+## 获取cocopilot token GHO-xxx，GHU-xxx
 
-[fakeopen by pengzhile](https://cocopilot.org/copilot/token)
+- [fakeopen by pengzhile](https://cocopilot.org/copilot/token)
+- 你需要github开通copilot的功能才能用
