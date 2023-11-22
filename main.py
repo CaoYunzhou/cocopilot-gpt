@@ -60,7 +60,7 @@ def proxy():
     # 转发请求并获取响应
     resp = forward_request(GHO_TOKEN, stream, json_data)
     print(resp)
-    return Response(resp, mimetype='application/json') if stream else resp
+    return Response(resp, mimetype='application/json; charset=utf-8') if stream else resp
 
 
 @app.route('/v1/models', methods=['GET'])
