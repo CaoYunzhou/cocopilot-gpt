@@ -14,7 +14,7 @@
 ```
 
 ## Railway部署：
-- [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/kQpQmc?referralCode=CG56Re)
+- [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/UhhP8o?referralCode=CG56Re)
 
 ## 使用
 
