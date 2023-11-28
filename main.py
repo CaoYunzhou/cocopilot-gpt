@@ -18,8 +18,7 @@ def forward_request(GHO_TOKEN: str, stream: bool, json_data):
 
     response = requests.get(
         'https://api.github.com/copilot_internal/v2/token', headers=headers)
-    # print("打印获取token的响应")
-    # print(response.text)
+    print(response.text)
     if response.status_code == 200:
         if response.json():
             access_token = response.json()['token']
