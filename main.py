@@ -15,12 +15,11 @@ def forward_request(GHO_TOKEN: str, stream: bool, json_data):
         'user-agent': 'GithubCopilot/1.129.0',
         'accept': '*/*',
     }
-    print(headers)
 
     response = requests.get(
         'https://api.github.com/copilot_internal/v2/token', headers=headers)
-    print("打印获取token的响应")
-    print(response.text)
+    # print("打印获取token的响应")
+    # print(response.text)
     if response.status_code == 200:
         if response.json():
             access_token = response.json()['token']
@@ -30,10 +29,7 @@ def forward_request(GHO_TOKEN: str, stream: bool, json_data):
                 'Authorization': f'Bearer {access_token}',
                 'Editor-Version': 'vscode/1.83.1',
             }
-            print(acc_headers)
-            print("打印请求的json数据")
-            print(json_data)
-            print("打印请求体")
+            print("打印请求体:" ,json_data)
             resp = requests.post(
                 'https://api.githubcopilot.com/chat/completions', headers=acc_headers, json=json_data, stream=stream)
             print(response.text)
@@ -50,7 +46,7 @@ def proxy():
     # 获取Authorization头部信息
     GHO_TOKEN = request.headers.get('Authorization')
     GHO_TOKEN = GHO_TOKEN.split(' ')[1]
-    print(GHO_TOKEN)
+    print("请求的秘钥", GHO_TOKEN)
     if GHO_TOKEN is None:
         return "Authorization header is missing", 401
 
@@ -59,7 +55,6 @@ def proxy():
 
     # 转发请求并获取响应
     resp = forward_request(GHO_TOKEN, stream, json_data)
-    print(resp)
     return Response(resp, mimetype='application/json; charset=utf-8') if stream else resp
 
 
