@@ -46,7 +46,7 @@ def proxy():
     # 获取Authorization头部信息
     GHO_TOKEN = request.headers.get('Authorization')
     GHO_TOKEN = GHO_TOKEN.split(' ')[1]
-    print("请求的秘钥", GHO_TOKEN)
+    print(GHO_TOKEN)
     if GHO_TOKEN is None:
         return "Authorization header is missing", 401
 
@@ -55,6 +55,7 @@ def proxy():
 
     # 转发请求并获取响应
     resp = forward_request(GHO_TOKEN, stream, json_data)
+    print(resp)
     return Response(resp, mimetype='application/json; charset=utf-8') if stream else resp
 
 
@@ -79,7 +80,7 @@ def models():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(host='0.0.0.0', port=8080, debug=False)
 
 
 # GHO_TOKEN = "gho_xx"
