@@ -29,7 +29,7 @@ def forward_request(GHO_TOKEN: str, stream: bool, json_data):
                 'Authorization': f'Bearer {access_token}',
                 'Editor-Version': 'vscode/1.83.1',
             }
-            print("打印请求体:" ,json_data)
+            print(json_data)
             resp = requests.post(
                 'https://api.githubcopilot.com/chat/completions', headers=acc_headers, json=json_data, stream=stream)
             print(response.text)
