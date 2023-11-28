@@ -54,7 +54,7 @@ def proxy():
 
     # 转发请求并获取响应
     resp = forward_request(GHO_TOKEN, stream, json_data)
-    print(resp)
+    # print(resp)
     return Response(resp, mimetype='application/json; charset=utf-8') if stream else resp
 
 
