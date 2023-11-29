@@ -28,6 +28,7 @@
 
 ### Railway部署
 
+- [注册Railway](https://railway.app?referralCode=CG56Re)
 - [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/UhhP8o?referralCode=CG56Re)
 
 ### 使用方式
