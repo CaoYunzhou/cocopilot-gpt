@@ -1,5 +1,6 @@
 import requests
 from flask import Flask, request, Response, jsonify
+import uuid
 
 
 app = Flask(__name__)
@@ -10,10 +11,12 @@ def forward_request(GHO_TOKEN: str, stream: bool, json_data):
     headers = {
         'Host': 'api.github.com',
         'authorization': f'token {GHO_TOKEN}',
-        'editor-version': 'JetBrains-IU/232.10203.10',
-        'editor-plugin-version': 'copilot-intellij/1.3.3.3572',
-        'user-agent': 'GithubCopilot/1.129.0',
-        'accept': '*/*',
+        "Editor-Version": "vscode/1.84.2",
+        "Editor-Plugin-Version": "copilot/1.138.0",
+        "User-Agent": "GithubCopilot/1.138.0",
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Connection": "close"
     }
 
     response = requests.get(
@@ -24,9 +27,17 @@ def forward_request(GHO_TOKEN: str, stream: bool, json_data):
             access_token = response.json()['token']
 
             acc_headers = {
-                'Content-Type': 'application/json',
                 'Authorization': f'Bearer {access_token}',
-                'Editor-Version': 'vscode/1.83.1',
+                'X-Request-Id': str(uuid.uuid4()),
+                'Vscode-Sessionid': str(uuid.uuid4()),
+                'Editor-Version': 'vscode/1.84.2',
+                'Editor-Plugin-Version': 'copilot-chat/0.10.2',
+                'Openai-Organization': 'github-copilot',
+                'Openai-Intent': 'conversation-panel',
+                'Content-Type': 'application/json',
+                'User-Agent': 'GitHubCopilotChat/0.10.2',
+                'Accept': '*/*',
+                'Accept-Encoding': 'gzip, deflate, br',
             }
             print(json_data)
             resp = requests.post(
