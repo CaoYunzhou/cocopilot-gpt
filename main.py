@@ -1,10 +1,12 @@
 import requests
 from flask import Flask, request, Response, jsonify
 import uuid
-
+import datetime
+import hashlib
 
 app = Flask(__name__)
 
+machine_id = hashlib.sha256(str(uuid.uuid4).encode()).hexdigest()
 
 def forward_request(GHO_TOKEN: str, stream: bool, json_data):
 
@@ -29,7 +31,8 @@ def forward_request(GHO_TOKEN: str, stream: bool, json_data):
             acc_headers = {
                 'Authorization': f'Bearer {access_token}',
                 'X-Request-Id': str(uuid.uuid4()),
-                'Vscode-Sessionid': str(uuid.uuid4()),
+                'Vscode-Sessionid': str(uuid.uuid4()) + str(int(datetime.datetime.utcnow().timestamp() * 1000)),
+                'vscode-machineid': machine_id,
                 'Editor-Version': 'vscode/1.84.2',
                 'Editor-Plugin-Version': 'copilot-chat/0.10.2',
                 'Openai-Organization': 'github-copilot',
