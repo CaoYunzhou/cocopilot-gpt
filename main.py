@@ -6,9 +6,9 @@ import hashlib
 
 app = Flask(__name__)
 
-machine_id = hashlib.sha256(str(uuid.uuid4).encode()).hexdigest()
+machine_id = hashlib.sha256(str(uuid.uuid4()).encode()).hexdigest()
 
-def forward_request(GHO_TOKEN: str, stream: bool, json_data):
+def forward_request(GHO_TOKEN: str, json_data):
 
     headers = {
         'Host': 'api.github.com',
@@ -23,31 +23,27 @@ def forward_request(GHO_TOKEN: str, stream: bool, json_data):
 
     response = requests.get(
         'https://api.github.com/copilot_internal/v2/token', headers=headers)
-    print(response.text)
-    if response.status_code == 200:
-        if response.json():
-            access_token = response.json()['token']
+    print("Auth:",response.text)
+    if response.status_code == 200 and response.json():
+        access_token = response.json()['token']
 
-            acc_headers = {
-                'Authorization': f'Bearer {access_token}',
-                'X-Request-Id': str(uuid.uuid4()),
-                'Vscode-Sessionid': str(uuid.uuid4()) + str(int(datetime.datetime.utcnow().timestamp() * 1000)),
-                'vscode-machineid': machine_id,
-                'Editor-Version': 'vscode/1.84.2',
-                'Editor-Plugin-Version': 'copilot-chat/0.10.2',
-                'Openai-Organization': 'github-copilot',
-                'Openai-Intent': 'conversation-panel',
-                'Content-Type': 'application/json',
-                'User-Agent': 'GitHubCopilotChat/0.10.2',
-                'Accept': '*/*',
-                'Accept-Encoding': 'gzip, deflate, br',
-            }
-            print(json_data)
-            resp = requests.post(
-                'https://api.githubcopilot.com/chat/completions', headers=acc_headers, json=json_data, stream=stream)
-            print(response.text)
-            return resp.iter_content(chunk_size=8192) if stream else resp.json()
+        acc_headers = {
+            'Authorization': f'Bearer {access_token}',
+            'X-Request-Id': str(uuid.uuid4()),
+            'Vscode-Sessionid': str(uuid.uuid4()) + str(int(datetime.datetime.utcnow().timestamp() * 1000)),
+            'vscode-machineid': machine_id,
+            'Editor-Version': 'vscode/1.84.2',
+            'Editor-Plugin-Version': 'copilot-chat/0.10.2',
+            'Openai-Organization': 'github-copilot',
+            'Openai-Intent': 'conversation-panel',
+            'Content-Type': 'application/json',
+            'User-Agent': 'GitHubCopilotChat/0.10.2',
+            'Accept': '*/*',
+            'Accept-Encoding': 'gzip, deflate, br',
+        }
 
+        resp = requests.post('https://api.githubcopilot.com/chat/completions', headers=acc_headers, json=json_data)
+        return resp
 
 
 @app.route('/v1/chat/completions', methods=['POST'])
@@ -59,7 +55,8 @@ def proxy():
     # 获取Authorization头部信息
     GHO_TOKEN = request.headers.get('Authorization')
     GHO_TOKEN = GHO_TOKEN.split(' ')[1]
-    print(GHO_TOKEN)
+    print("Secret:", GHO_TOKEN)
+    print("Message:", json_data)
     if GHO_TOKEN is None:
         return "Authorization header is missing", 401
 
@@ -67,9 +64,17 @@ def proxy():
     stream = json_data.get('stream', False)
 
     # 转发请求并获取响应
-    resp = forward_request(GHO_TOKEN, stream, json_data)
-    # print(resp)
-    return Response(resp, mimetype='application/json; charset=utf-8') if stream else resp
+    resp = forward_request(GHO_TOKEN, json_data)
+    # 处理流式输出
+
+    if stream:
+        return Response(generate_chunks(resp), content_type='application/json')
+
+    return Response(resp.content, content_type='application/json')
+
+def generate_chunks(response):
+    for chunk in response.iter_content(chunk_size=8192):
+        yield chunk.decode('utf-8')
 
 
 @app.route('/v1/models', methods=['GET'])
