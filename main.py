@@ -42,8 +42,11 @@ def forward_request(GHO_TOKEN: str, json_data):
             'Accept-Encoding': 'gzip, deflate, br',
         }
 
-        resp = requests.post('https://api.githubcopilot.com/chat/completions', headers=acc_headers, json=json_data)
+        resp = requests.post('https://api.githubcopilot.com/chat/completions', headers=acc_headers, json=json_data, stream=False)
         return resp
+    else:
+        # print(response.text)
+        return response
 
 
 @app.route('/v1/chat/completions', methods=['POST'])
