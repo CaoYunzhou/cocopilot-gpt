@@ -7,11 +7,11 @@
 
 - 这个项目提供了一个快速简便的方式来使用cocopilot to chatgpt4
 - `重点强调自己部署，降低风控`
-- [[copilot](https://github.com/settings/copilot)](https://github.com/settings/copilot) 是一个免费的AI应用，让你可以和 GPT 模型聊天。让它可以通过一个 HTTP API 来访问，这个 API 模仿了官方的 OpenAI API for ChatGPT，所以它可以和其他使用 OpenAI API for ChatGPT 的程序兼容。
+- [Github Copilot](https://github.com/settings/copilot) 是一个免费的AI应用，让你可以和 GPT 模型聊天。让它可以通过一个 HTTP API 来访问，这个 API 模仿了官方的 OpenAI API for ChatGPT，所以它可以和其他使用 OpenAI API for ChatGPT 的程序兼容。
 
 ## 使用条件，获取copilot token GHO-xxx，GHU-xxx
 
-- 你需要登录到github开通copilot的功能才能用
+- 你需要登录到github**开通copilot**的功能才能用
 - 通过下面的地址便捷的获取 `GHO-xxx,GHU-xxx`
   - [fakeopen by pengzhile](https://cocopilot.org/copilot/token)
 
@@ -56,6 +56,11 @@ curl --location 'https://cocopilot.aivvm.com/v1/chat/completions' \
   "messages": [{"role": "user", "content": "hi"}]
 }'
 ```
+
+### 环境变量
+- `ENDPOINT` copilot的endpoint，默认为 *https://api.githubcopilot.com*
+- `TOKEN` 调用时默认的token，默认为空，可不填调用时传入
+
 
 ### Star History
 

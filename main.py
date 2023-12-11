@@ -3,16 +3,35 @@ from flask import Flask, request, Response, jsonify
 import uuid
 import datetime
 import hashlib
+from os import environ
 
 app = Flask(__name__)
-
 machine_id = hashlib.sha256(str(uuid.uuid4()).encode()).hexdigest()
+endpoint = environ.get('ENDPOINT', 'https://api.githubcopilot.com')
+access = environ.get('TOKEN', '')
 
-def forward_request(GHO_TOKEN: str, json_data):
 
+def get_header(access_token: str):
+    return {
+        'Authorization': f'Bearer {access_token}',
+        'X-Request-Id': str(uuid.uuid4()),
+        'Vscode-Sessionid': str(uuid.uuid4()) + str(int(datetime.datetime.utcnow().timestamp() * 1000)),
+        'vscode-machineid': machine_id,
+        'Editor-Version': 'vscode/1.84.2',
+        'Editor-Plugin-Version': 'copilot-chat/0.10.2',
+        'Openai-Organization': 'github-copilot',
+        'Openai-Intent': 'conversation-panel',
+        'Content-Type': 'application/json',
+        'User-Agent': 'GitHubCopilotChat/0.10.2',
+        'Accept': '*/*',
+        'Accept-Encoding': 'gzip, deflate, br',
+    }
+
+
+def forward_request(token: str, data, stream: bool = False):
     headers = {
         'Host': 'api.github.com',
-        'authorization': f'token {GHO_TOKEN}',
+        'authorization': f'token {token}',
         "Editor-Version": "vscode/1.84.2",
         "Editor-Plugin-Version": "copilot/1.138.0",
         "User-Agent": "GithubCopilot/1.138.0",
@@ -21,63 +40,56 @@ def forward_request(GHO_TOKEN: str, json_data):
         "Connection": "close"
     }
 
-    response = requests.get(
+    preflight = requests.get(
         'https://api.github.com/copilot_internal/v2/token', headers=headers)
-    print("Auth:",response.text)
-    if response.status_code == 200 and response.json():
-        access_token = response.json()['token']
+    print("Auth:", preflight.text)
+    if preflight.status_code == 200 and preflight.json():
+        access_token = preflight.json().get('token')
 
-        acc_headers = {
-            'Authorization': f'Bearer {access_token}',
-            'X-Request-Id': str(uuid.uuid4()),
-            'Vscode-Sessionid': str(uuid.uuid4()) + str(int(datetime.datetime.utcnow().timestamp() * 1000)),
-            'vscode-machineid': machine_id,
-            'Editor-Version': 'vscode/1.84.2',
-            'Editor-Plugin-Version': 'copilot-chat/0.10.2',
-            'Openai-Organization': 'github-copilot',
-            'Openai-Intent': 'conversation-panel',
-            'Content-Type': 'application/json',
-            'User-Agent': 'GitHubCopilotChat/0.10.2',
-            'Accept': '*/*',
-            'Accept-Encoding': 'gzip, deflate, br',
-        }
-
-        resp = requests.post('https://api.githubcopilot.com/chat/completions', headers=acc_headers, json=json_data, stream=False)
+        resp = requests.post(
+            endpoint + '/chat/completions',
+            headers=get_header(access_token), json=data, stream=stream,
+        )
         return resp
     else:
-        # print(response.text)
-        return response
+        return preflight
 
 
 @app.route('/v1/chat/completions', methods=['POST'])
 def proxy():
-    # 从请求中获取json数据
-    json_data = request.get_json()
-    if json_data is None:
+    data = request.get_json()
+    if data is None:
         return "Request body is missing or not in JSON format", 400
-    # 获取Authorization头部信息
-    GHO_TOKEN = request.headers.get('Authorization')
-    GHO_TOKEN = GHO_TOKEN.split(' ')[1]
-    print("Secret:", GHO_TOKEN)
-    print("Message:", json_data)
-    if GHO_TOKEN is None:
+
+    # get authorization token from request header (e.g. `gho_xxx` or Bearer `gho_xxx`)
+    segment = request.headers.get('Authorization', access).split(' ')
+    secret = segment[1] if len(segment) == 2 else segment[0]
+
+    print("Secret:", secret)
+    print("Message:", data)
+    if secret is None:
         return "Authorization header is missing", 401
 
-    # Check if stream option is set in the request data
-    stream = json_data.get('stream', False)
+    # get stream flag from request body
+    stream = data.get('stream', False)
 
-    # 转发请求并获取响应
-    resp = forward_request(GHO_TOKEN, json_data)
-    # 处理流式输出
+    # forward request to copilot
+    resp = forward_request(secret, data, stream)
 
-    if stream:
-        return Response(generate_chunks(resp), content_type='application/json')
+    return (
+        Response(generate_chunks(resp), content_type='text/event-stream')
+        if stream else
+        Response(resp.content, content_type='application/json')
+    )
 
-    return Response(resp.content, content_type='application/json')
 
 def generate_chunks(response):
     for chunk in response.iter_content(chunk_size=8192):
-        yield chunk.decode('utf-8')
+        try:
+            yield chunk.decode('utf-8')
+        except UnicodeDecodeError:
+            # ignore invalid chunks
+            pass
 
 
 @app.route('/v1/models', methods=['GET'])
@@ -86,15 +98,15 @@ def models():
         "object": "list",
         "data": [
             {"id": "gpt-4-0314", "object": "model", "created": 1687882410,
-                "owned_by": "openai", "root": "gpt-4-0314", "parent": None},
+             "owned_by": "openai", "root": "gpt-4-0314", "parent": None},
             {"id": "gpt-4-0613", "object": "model", "created": 1686588896,
-                "owned_by": "openai", "root": "gpt-4-0613", "parent": None},
+             "owned_by": "openai", "root": "gpt-4-0613", "parent": None},
             {"id": "gpt-4", "object": "model", "created": 1687882411,
-                "owned_by": "openai", "root": "gpt-4", "parent": None},
+             "owned_by": "openai", "root": "gpt-4", "parent": None},
             {"id": "gpt-3.5-turbo", "object": "model", "created": 1677610602,
-                "owned_by": "openai", "root": "gpt-3.5-turbo", "parent": None},
+             "owned_by": "openai", "root": "gpt-3.5-turbo", "parent": None},
             {"id": "gpt-3.5-turbo-0301", "object": "model", "created": 1677649963,
-                "owned_by": "openai", "root": "gpt-3.5-turbo-0301", "parent": None},
+             "owned_by": "openai", "root": "gpt-3.5-turbo-0301", "parent": None},
         ]
     }
     return jsonify(data)
@@ -102,7 +114,3 @@ def models():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=False)
-
-
-# GHO_TOKEN = "gho_xx"
-# set_access_token(get_token(GHO_TOKEN)['token'])
