@@ -15,6 +15,11 @@
 - 通过下面的地址便捷的获取 `GHO-xxx,GHU-xxx`
   - [fakeopen by pengzhile](https://cocopilot.org/copilot/token)
 
+## 广告推广
+
+- 使用企业github拼车copilot使用
+- 低于官方**10$/月**: 可以联系QQ号：496618601
+
 ### Docker部署
 
 - docker run快速开始：
