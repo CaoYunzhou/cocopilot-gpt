@@ -67,7 +67,7 @@ def proxy():
     stream = json_data.get('stream', False)
 
     # 转发请求并获取响应
-    resp = forward_request(GHO_TOKEN, json_data)
+    resp = forward_request(GHO_TOKEN, stream, json_data)
     # 处理流式输出
 
     if stream:
