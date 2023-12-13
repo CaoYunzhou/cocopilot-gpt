@@ -70,14 +70,7 @@ def proxy():
     resp = forward_request(GHO_TOKEN, stream, json_data)
     # 处理流式输出
 
-    if stream:
-        return Response(generate_chunks(resp), content_type='application/json')
-
-    return Response(resp.content, content_type='application/json')
-
-def generate_chunks(response):
-    for chunk in response.iter_content(chunk_size=8192):
-        yield chunk.decode('utf-8')
+    return Response(resp, mimetype='application/json') if stream else resp
 
 
 @app.route('/v1/models', methods=['GET'])
