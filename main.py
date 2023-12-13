@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 machine_id = hashlib.sha256(str(uuid.uuid4()).encode()).hexdigest()
 
-def forward_request(GHO_TOKEN: str, json_data):
+def forward_request(GHO_TOKEN: str, stream: bool, json_data):
 
     headers = {
         'Host': 'api.github.com',
@@ -42,8 +42,8 @@ def forward_request(GHO_TOKEN: str, json_data):
             'Accept-Encoding': 'gzip, deflate, br',
         }
 
-        resp = requests.post('https://api.githubcopilot.com/chat/completions', headers=acc_headers, json=json_data, stream=False)
-        return resp
+        resp = requests.post('https://api.githubcopilot.com/chat/completions', headers=acc_headers, json=json_data, stream=stream)
+        return resp.iter_content(chunk_size=8192) if stream else resp.json()
     else:
         # print(response.text)
         return response
