@@ -13,12 +13,11 @@ def forward_request(GHO_TOKEN: str, stream: bool, json_data):
     headers = {
         'Host': 'api.github.com',
         'authorization': f'token {GHO_TOKEN}',
-        "Editor-Version": "vscode/1.84.2",
-        "Editor-Plugin-Version": "copilot/1.138.0",
-        "User-Agent": "GithubCopilot/1.138.0",
-        "Accept": "*/*",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Connection": "close"
+        'Editor-Version': 'vscode/1.85.0',
+        'Editor-Plugin-Version': 'copilot-chat/0.11.1',
+        'User-Agent': 'GitHubCopilotChat/0.11.1',
+        'Accept': '*/*',
+        "Accept-Encoding": "gzip, deflate, br"
     }
 
     response = requests.get(
@@ -28,16 +27,19 @@ def forward_request(GHO_TOKEN: str, stream: bool, json_data):
         access_token = response.json()['token']
 
         acc_headers = {
+            'Host': 'api.githubcopilot.com',
             'Authorization': f'Bearer {access_token}',
             'X-Request-Id': str(uuid.uuid4()),
+            'X-Github-Api-Version': '2023-07-07',
             'Vscode-Sessionid': str(uuid.uuid4()) + str(int(datetime.datetime.utcnow().timestamp() * 1000)),
             'vscode-machineid': machine_id,
-            'Editor-Version': 'vscode/1.84.2',
-            'Editor-Plugin-Version': 'copilot-chat/0.10.2',
+            'Editor-Version': 'vscode/1.85.0',
+            'Editor-Plugin-Version': 'copilot-chat/0.11.1',
             'Openai-Organization': 'github-copilot',
+            'Copilot-Integration-Id': 'vscode-chat',
             'Openai-Intent': 'conversation-panel',
             'Content-Type': 'application/json',
-            'User-Agent': 'GitHubCopilotChat/0.10.2',
+            'User-Agent': 'GitHubCopilotChat/0.11.1',
             'Accept': '*/*',
             'Accept-Encoding': 'gzip, deflate, br',
         }
