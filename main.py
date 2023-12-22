@@ -25,7 +25,7 @@ def forward_request(GHO_TOKEN: str, stream: bool, json_data):
     print("Auth:",response.text)
     if response.status_code == 200 and response.json()['token']:
         access_token = response.json()['token']
-        # print("token: %s" %(access_token))
+        print("Requests_Token: %s" %(access_token))
 
         acc_headers = {
             'Host': 'api.githubcopilot.com',
