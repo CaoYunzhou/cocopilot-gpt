@@ -23,8 +23,9 @@ def forward_request(GHO_TOKEN: str, stream: bool, json_data):
     response = requests.get(
         'https://api.github.com/copilot_internal/v2/token', headers=headers)
     print("Auth:",response.text)
-    if response.status_code == 200 and response.json():
+    if response.status_code == 200 and response.json()['token']:
         access_token = response.json()['token']
+        # print("token: %s" %(access_token))
 
         acc_headers = {
             'Host': 'api.githubcopilot.com',
@@ -48,7 +49,7 @@ def forward_request(GHO_TOKEN: str, stream: bool, json_data):
         return resp.iter_content(chunk_size=8192) if stream else resp.json()
     else:
         # print(response.text)
-        return response
+        return response.json()
 
 
 @app.route('/v1/chat/completions', methods=['POST'])
