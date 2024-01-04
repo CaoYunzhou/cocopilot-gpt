@@ -13,7 +13,7 @@ def forward_request(GHO_TOKEN: str, stream: bool, json_data):
     headers = {
         'Host': 'api.github.com',
         'authorization': f'token {GHO_TOKEN}',
-        'Editor-Version': 'vscode/1.85.0',
+        'Editor-Version': 'vscode/1.85.1',
         'Editor-Plugin-Version': 'copilot-chat/0.11.1',
         'User-Agent': 'GitHubCopilotChat/0.11.1',
         'Accept': '*/*',
@@ -34,7 +34,7 @@ def forward_request(GHO_TOKEN: str, stream: bool, json_data):
             'X-Github-Api-Version': '2023-07-07',
             'Vscode-Sessionid': str(uuid.uuid4()) + str(int(datetime.datetime.utcnow().timestamp() * 1000)),
             'vscode-machineid': machine_id,
-            'Editor-Version': 'vscode/1.85.0',
+            'Editor-Version': 'vscode/1.85.1',
             'Editor-Plugin-Version': 'copilot-chat/0.11.1',
             'Openai-Organization': 'github-copilot',
             'Copilot-Integration-Id': 'vscode-chat',
