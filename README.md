@@ -62,6 +62,18 @@ curl --location 'https://cocopilot.aivvm.com/v1/chat/completions' \
 }'
 ```
 
+- text-embedding-ada-002
+
+```shell
+curl --location 'https://cocopilot.aivvm.com/v1/embeddings' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer gho_xxx' \
+--data '{
+  "input":["Your text string goes here"],
+  "model":"text-embedding-ada-002"
+  }'
+```
+
 ### 支持的模型
 
 - gpt-4
